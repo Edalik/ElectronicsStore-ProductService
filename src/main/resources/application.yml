@@ -1,0 +1,27 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5450/postgres
+    username: product_service
+    password: product_service
+    hikari:
+      schema: products
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+springdoc:
+  api-docs:
+    path: /product-service/v3/api-docs
+  swagger-ui:
+    path: /product-service/swagger-ui.html
+
+logging:
+  level:
+    org:
+      zalando:
+        logbook:
+          Logbook: TRACE
