@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="0001-create-category-table" author="a.yakubov">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="category"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="category">
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="0001-create-product-table" author="a.yakubov">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="category"/>
+            <not>
+                <tableExists tableName="product"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="product">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="category" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="varchar(255)"/>
+
+            <column name="price" type="numeric">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="count" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="product"
+                                 baseColumnNames="category"
+                                 constraintName="product_category_fkey"
+                                 referencedTableName="category"
+                                 referencedColumnNames="name"/>
+    </changeSet>
+
+    <changeSet id="0001-create-basket-table" author="a.yakubov">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="product"/>
+            <not>
+                <tableExists tableName="basket"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="basket">
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="product_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="count" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="basket" columnNames="user_id, product_id"/>
+
+        <addForeignKeyConstraint baseTableName="basket"
+                                 baseColumnNames="product_id"
+                                 constraintName="basket_product_fkey"
+                                 referencedTableName="product"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="0001-create-purchase-table" author="a.yakubov">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="product"/>
+            <not>
+                <tableExists tableName="purchase"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="purchase">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="product_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="count" type="integer">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="price" type="numeric">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="total_price" type="numeric">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="purchase_time" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="purchase"
+                                 baseColumnNames="product_id"
+                                 constraintName="purchase_product_fkey"
+                                 referencedTableName="product"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>
