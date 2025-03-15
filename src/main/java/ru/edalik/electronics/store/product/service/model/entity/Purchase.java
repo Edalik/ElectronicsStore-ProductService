@@ -41,8 +41,8 @@ public class Purchase {
     @ManyToOne(fetch = FetchType.EAGER)
     private Product product;
 
-    @Column(name = "count")
-    private Integer count;
+    @Column(name = "quantity")
+    private Integer quantity;
 
     @Column(name = "price")
     private BigDecimal price;
