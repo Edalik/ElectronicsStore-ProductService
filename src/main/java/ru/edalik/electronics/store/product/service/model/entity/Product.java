@@ -45,7 +45,7 @@ public class Product {
     @Column(name = "price")
     private BigDecimal price;
 
-    @Column(name = "count")
-    private Integer count;
+    @Column(name = "quantity")
+    private Integer quantity;
 
 }

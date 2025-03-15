@@ -45,7 +45,7 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="count" type="integer">
+            <column name="quantity" type="integer">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -74,7 +74,7 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="count" type="integer">
+            <column name="quantity" type="integer">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -109,7 +109,7 @@
                 <constraints nullable="false"/>
             </column>
 
-            <column name="count" type="integer">
+            <column name="quantity" type="integer">
                 <constraints nullable="false"/>
             </column>
 

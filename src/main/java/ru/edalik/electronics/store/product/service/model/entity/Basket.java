@@ -26,10 +26,10 @@ import java.util.UUID;
 public class Basket {
 
     @EmbeddedId
-    private BasketId name;
+    private BasketId compositeKey;
 
-    @Column(name = "count")
-    private Integer count;
+    @Column(name = "quantity")
+    private Integer quantity;
 
     @Embeddable
     @Getter
