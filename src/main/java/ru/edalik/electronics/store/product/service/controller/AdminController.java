@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.edalik.electronics.store.product.service.mapper.CategoryMapper;
 import ru.edalik.electronics.store.product.service.mapper.ProductMapper;
 import ru.edalik.electronics.store.product.service.model.dto.CategoryDto;
+import ru.edalik.electronics.store.product.service.model.dto.ProductDto;
 import ru.edalik.electronics.store.product.service.model.dto.exception.ErrorDto;
 import ru.edalik.electronics.store.product.service.model.dto.exception.ValidationErrorDto;
-import ru.edalik.electronics.store.product.service.model.dto.ProductDto;
 import ru.edalik.electronics.store.product.service.service.interfaces.AdminService;
 
 import java.util.UUID;
@@ -59,16 +59,16 @@ public class AdminController {
     }
 
     @Operation(
-        summary = "Удаление продукта",
-        description = "Удаляет продукт из системы"
+        summary = "Удаление товара",
+        description = "Удаляет товар из системы"
     )
     @ApiResponse(
         responseCode = "204",
-        description = "Продукт успешно удален"
+        description = "Товар успешно удален"
     )
     @ApiResponse(
         responseCode = "404",
-        description = "Продукт не найден",
+        description = "Товар не найден",
         content = @Content(schema = @Schema(implementation = ErrorDto.class))
     )
     @DeleteMapping("/product/{id}")
