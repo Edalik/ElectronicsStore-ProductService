@@ -4,13 +4,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Builder
-@Schema(description = "DTO для представления продукта")
+@Schema(description = "DTO для представления товара")
 public record ProductDto(
     @Schema(
         description = "UUID пользователя",

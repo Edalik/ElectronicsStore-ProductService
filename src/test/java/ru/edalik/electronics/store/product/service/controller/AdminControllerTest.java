@@ -1,6 +1,7 @@
 package ru.edalik.electronics.store.product.service.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -58,7 +59,8 @@ class AdminControllerTest {
     CategoryMapper categoryMapper;
 
     @Test
-    void upsertProduct_ValidInput_ReturnsProductDto() throws Exception {
+    @SneakyThrows
+    void upsertProduct_ValidInput_ReturnsProductDto() {
         ProductDto requestDto = new ProductDto(
             PRODUCT_ID,
             NAME,
@@ -88,7 +90,8 @@ class AdminControllerTest {
     }
 
     @Test
-    void upsertProduct_InvalidInput_ReturnsValidationErrors() throws Exception {
+    @SneakyThrows
+    void upsertProduct_InvalidInput_ReturnsValidationErrors() {
         ProductDto invalidDto = new ProductDto(
             null,
             "",
@@ -110,7 +113,8 @@ class AdminControllerTest {
     }
 
     @Test
-    void deleteProductById_ExistingProduct_ReturnsNoContent() throws Exception {
+    @SneakyThrows
+    void deleteProductById_ExistingProduct_ReturnsNoContent() {
         mockMvc.perform(delete(BASE_URL + "/product/{id}", PRODUCT_ID))
             .andExpect(status().isNoContent());
 
@@ -118,7 +122,8 @@ class AdminControllerTest {
     }
 
     @Test
-    void deleteProductById_NotExistingProduct_ReturnsNotFound() throws Exception {
+    @SneakyThrows
+    void deleteProductById_NotExistingProduct_ReturnsNotFound() {
         String errorMessage = "Product not found";
         doThrow(new NotFoundException(errorMessage)).when(adminService).deleteProductById(PRODUCT_ID);
 
@@ -129,7 +134,8 @@ class AdminControllerTest {
     }
 
     @Test
-    void upsertCategory_ValidInput_ReturnsCategoryDto() throws Exception {
+    @SneakyThrows
+    void upsertCategory_ValidInput_ReturnsCategoryDto() {
         Category category = mock(Category.class);
         CategoryDto responseDto = mock(CategoryDto.class);
 
@@ -148,7 +154,8 @@ class AdminControllerTest {
     }
 
     @Test
-    void upsertCategory_InvalidInput_ReturnsValidationErrors() throws Exception {
+    @SneakyThrows
+    void upsertCategory_InvalidInput_ReturnsValidationErrors() {
         CategoryDto invalidDto = new CategoryDto("");
 
         mockMvc.perform(
