@@ -34,9 +34,9 @@ class BasketControllerTest {
     static final String BASE_URL = "/api/v1/products/basket";
     static final String USER_ID_HEADER = "User-Id";
     static final UUID USER_ID = UUID.randomUUID();
-    static final String PRODUCT_ID_HEADER = "product-id";
+    static final String PRODUCT_ID_PARAM = "product-id";
     static final UUID PRODUCT_ID = UUID.randomUUID();
-    static final String QUANTITY_HEADER = "quantity";
+    static final String QUANTITY_PARAM = "quantity";
     static final int QUANTITY = 2;
 
     @Autowired
@@ -63,8 +63,8 @@ class BasketControllerTest {
         mockMvc.perform(
                 post(BASE_URL)
                     .header(USER_ID_HEADER, USER_ID)
-                    .param(PRODUCT_ID_HEADER, PRODUCT_ID.toString())
-                    .param(QUANTITY_HEADER, String.valueOf(QUANTITY))
+                    .param(PRODUCT_ID_PARAM, PRODUCT_ID.toString())
+                    .param(QUANTITY_PARAM, String.valueOf(QUANTITY))
             )
             .andExpect(status().isOk())
             .andExpect(content().json(objectMapper.writeValueAsString(dto)));
@@ -76,11 +76,11 @@ class BasketControllerTest {
         mockMvc.perform(
                 post(BASE_URL)
                     .header(USER_ID_HEADER, USER_ID)
-                    .param(PRODUCT_ID_HEADER, PRODUCT_ID.toString())
-                    .param(QUANTITY_HEADER, "-1")
+                    .param(PRODUCT_ID_PARAM, PRODUCT_ID.toString())
+                    .param(QUANTITY_PARAM, "-1")
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.fields[0].field").value(QUANTITY_HEADER));
+            .andExpect(jsonPath("$.fields[0].field").value(QUANTITY_PARAM));
     }
 
     @Test
@@ -91,8 +91,8 @@ class BasketControllerTest {
         mockMvc.perform(
                 post(BASE_URL)
                     .header(USER_ID_HEADER, USER_ID)
-                    .param(PRODUCT_ID_HEADER, PRODUCT_ID.toString())
-                    .param(QUANTITY_HEADER, String.valueOf(QUANTITY))
+                    .param(PRODUCT_ID_PARAM, PRODUCT_ID.toString())
+                    .param(QUANTITY_PARAM, String.valueOf(QUANTITY))
             )
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.message").value("Insufficient product quantity"));
@@ -108,8 +108,8 @@ class BasketControllerTest {
 
         mockMvc.perform(post(BASE_URL)
                 .header(USER_ID_HEADER, USER_ID)
-                .param(PRODUCT_ID_HEADER, PRODUCT_ID.toString())
-                .param(QUANTITY_HEADER, String.valueOf(quantity)))
+                .param(PRODUCT_ID_PARAM, PRODUCT_ID.toString())
+                .param(QUANTITY_PARAM, String.valueOf(quantity)))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.error").value("Not Found"))
             .andExpect(jsonPath("$.message").value(errorMessage));
@@ -135,7 +135,7 @@ class BasketControllerTest {
     void removeFromBasket_Success_ReturnsNoContent() {
         mockMvc.perform(delete(BASE_URL)
                 .header(USER_ID_HEADER, USER_ID)
-                .param(PRODUCT_ID_HEADER, PRODUCT_ID.toString()))
+                .param(PRODUCT_ID_PARAM, PRODUCT_ID.toString()))
             .andExpect(status().isNoContent());
 
         verify(basketService).removeFromBasket(USER_ID, PRODUCT_ID);
@@ -150,7 +150,7 @@ class BasketControllerTest {
 
         mockMvc.perform(delete(BASE_URL)
                 .header(USER_ID_HEADER, USER_ID)
-                .param(PRODUCT_ID_HEADER, PRODUCT_ID.toString()))
+                .param(PRODUCT_ID_PARAM, PRODUCT_ID.toString()))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.error").value("Not Found"))
             .andExpect(jsonPath("$.message").value(errorMessage));
@@ -160,8 +160,8 @@ class BasketControllerTest {
     @SneakyThrows
     void addToBasket_MissingUserId_ReturnsBadRequest() {
         mockMvc.perform(post(BASE_URL)
-                .param(PRODUCT_ID_HEADER, PRODUCT_ID.toString())
-                .param(QUANTITY_HEADER, "1"))
+                .param(PRODUCT_ID_PARAM, PRODUCT_ID.toString())
+                .param(QUANTITY_PARAM, "1"))
             .andExpect(status().isBadRequest());
     }
 

@@ -2,3 +2,10 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
+
+custom:
+  feign:
+    client:
+      user:
+        service:
+          url: http://localhost:8082/api/v1/users
