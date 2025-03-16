@@ -13,6 +13,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import ru.edalik.electronics.store.product.service.model.dto.exception.ErrorDto;
 import ru.edalik.electronics.store.product.service.model.dto.exception.ValidationErrorDto;
 import ru.edalik.electronics.store.product.service.model.dto.exception.ValidationErrorFieldDto;
+import ru.edalik.electronics.store.product.service.model.exception.InsufficientFunds;
 import ru.edalik.electronics.store.product.service.model.exception.InsufficientQuantityException;
 import ru.edalik.electronics.store.product.service.model.exception.NotFoundException;
 
@@ -84,6 +85,18 @@ public class GlobalExceptionHandler {
         InsufficientQuantityException ex,
         HttpServletRequest request
     ) {
+        ErrorDto errorDto = ErrorDto.builder()
+            .timestamp(ZonedDateTime.now())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+            .message(ex.getMessage())
+            .path(request.getRequestURI())
+            .build();
+        return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = InsufficientFunds.class)
+    public ResponseEntity<ErrorDto> handleInsufficientFunds(InsufficientFunds ex, HttpServletRequest request) {
         ErrorDto errorDto = ErrorDto.builder()
             .timestamp(ZonedDateTime.now())
             .status(HttpStatus.BAD_REQUEST.value())

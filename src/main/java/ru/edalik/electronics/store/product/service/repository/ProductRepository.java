@@ -17,4 +17,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID>,
     @Query("DELETE Product p WHERE p.id = :id")
     int customDeleteById(UUID id);
 
+    @Modifying
+    @Query("UPDATE Product p SET p.quantity = p.quantity - :quantity WHERE p.id = :id")
+    int decreaseQuantity(Integer quantity, UUID id);
+
 }
