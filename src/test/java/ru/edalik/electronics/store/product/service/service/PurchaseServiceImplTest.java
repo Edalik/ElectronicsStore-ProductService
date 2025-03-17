@@ -14,6 +14,7 @@ import ru.edalik.electronics.store.product.service.model.exception.InsufficientQ
 import ru.edalik.electronics.store.product.service.model.exception.NotFoundException;
 import ru.edalik.electronics.store.product.service.repository.ProductRepository;
 import ru.edalik.electronics.store.product.service.repository.PurchaseRepository;
+import ru.edalik.electronics.store.product.service.service.kafka.KafkaProducer;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +48,9 @@ class PurchaseServiceImplTest {
     @Mock
     UserServiceClient userServiceClient;
 
+    @Mock
+    KafkaProducer kafkaProducer;
+
     @InjectMocks
     PurchaseServiceImpl purchaseService;
 
@@ -64,6 +69,8 @@ class PurchaseServiceImplTest {
         Purchase result = purchaseService.makePurchase(USER_ID, PRODUCT_ID, QUANTITY);
 
         assertEquals(purchase, result);
+
+        verify(kafkaProducer).sendMessage(any());
     }
 
     @Test

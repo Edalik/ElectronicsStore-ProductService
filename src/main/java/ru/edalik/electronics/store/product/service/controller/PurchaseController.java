@@ -80,6 +80,44 @@ public class PurchaseController {
     }
 
     @Operation(
+        summary = "Покупка товара из корзины",
+        description = "Совершает покупку товара из корзины"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Товар из корзины успешно куплен",
+        content = @Content(schema = @Schema(implementation = PurchaseDto.class))
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "Невалидные входные данные",
+        content = @Content(schema = @Schema(implementation = ValidationErrorDto.class))
+    )
+    @ApiResponse(
+        responseCode = "404",
+        description = "Товар не найден или корзина не найдена",
+        content = @Content(schema = @Schema(implementation = ErrorDto.class))
+    )
+    @PostMapping("/basket")
+    public PurchaseDto makePurchaseFromBasket(
+        @Parameter(
+            description = "UUID пользователя",
+            required = true,
+            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        )
+        @RequestHeader("User-Id") UUID userId,
+
+        @Parameter(
+            description = "UUID продукта",
+            required = true,
+            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+        )
+        @RequestParam("product-id") UUID productId
+    ) {
+        return purchaseMapper.toDto(purchaseService.makePurchaseFromBasket(userId, productId));
+    }
+
+    @Operation(
         summary = "Получение покупки по идентификатору",
         description = "Возвращает покупку по идентификатору"
     )

@@ -9,6 +9,8 @@ public interface PurchaseService {
 
     Purchase makePurchase(UUID userId, UUID productId, int quantity);
 
+    Purchase makePurchaseFromBasket(UUID userId, UUID productId);
+
     Purchase getPurchaseById(UUID userId, UUID purchaseId);
 
     List<Purchase> getPurchases(UUID userId);
