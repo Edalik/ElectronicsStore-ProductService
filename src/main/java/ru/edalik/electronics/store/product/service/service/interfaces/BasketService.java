@@ -7,10 +7,10 @@ import java.util.UUID;
 
 public interface BasketService {
 
-    List<Basket> getUserBasket(UUID userId);
+    List<Basket> getUserBasket();
 
-    Basket addToBasket(UUID userId, UUID productId, int quantity);
+    Basket addToBasket(UUID productId, int quantity);
 
-    void removeFromBasket(UUID userId, UUID productId);
+    void removeFromBasket(UUID productId);
 
 }

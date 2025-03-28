@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,8 @@ import ru.edalik.electronics.store.product.service.model.dto.exception.Validatio
 import ru.edalik.electronics.store.product.service.service.interfaces.AdminService;
 
 import java.util.UUID;
+
+import static ru.edalik.electronics.store.product.service.config.SecurityConfig.ROLE_ADMIN;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,6 +56,7 @@ public class AdminController {
         description = "Невалидные входные данные",
         content = @Content(schema = @Schema(implementation = ValidationErrorDto.class))
     )
+    @Secured(ROLE_ADMIN)
     @PostMapping("/product")
     public ProductDto upsert(@RequestBody @Valid ProductDto dto) {
         return productMapper.toDto(adminService.upsertProduct(productMapper.toEntity(dto)));
@@ -71,6 +75,7 @@ public class AdminController {
         description = "Товар не найден",
         content = @Content(schema = @Schema(implementation = ErrorDto.class))
     )
+    @Secured(ROLE_ADMIN)
     @DeleteMapping("/product/{id}")
     public ResponseEntity<Void> deleteProductById(
         @Parameter(
@@ -99,6 +104,7 @@ public class AdminController {
         description = "Невалидные входные данные",
         content = @Content(schema = @Schema(implementation = ValidationErrorDto.class))
     )
+    @Secured(ROLE_ADMIN)
     @PutMapping("/category")
     public CategoryDto upsert(@RequestBody @Valid CategoryDto dto) {
         return categoryMapper.toDto(adminService.addCategory(categoryMapper.toEntity(dto)));

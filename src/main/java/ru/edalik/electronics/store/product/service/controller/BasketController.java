@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,13 +57,6 @@ public class BasketController {
     @PostMapping
     public BasketDto addToBasket(
         @Parameter(
-            description = "UUID пользователя",
-            required = true,
-            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-        )
-        @RequestHeader("User-Id") UUID userId,
-
-        @Parameter(
             description = "UUID товара",
             required = true,
             example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -78,7 +70,7 @@ public class BasketController {
         )
         @RequestParam @Positive int quantity
     ) {
-        return basketMapper.toDto(basketService.addToBasket(userId, productId, quantity));
+        return basketMapper.toDto(basketService.addToBasket(productId, quantity));
     }
 
     @Operation(
@@ -91,15 +83,8 @@ public class BasketController {
         content = @Content(schema = @Schema(implementation = BasketDto.class))
     )
     @GetMapping
-    public List<BasketDto> getUserBasket(
-        @Parameter(
-            description = "UUID пользователя",
-            required = true,
-            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-        )
-        @RequestHeader("User-Id") UUID userId
-    ) {
-        return basketMapper.toDto(basketService.getUserBasket(userId));
+    public List<BasketDto> getUserBasket() {
+        return basketMapper.toDto(basketService.getUserBasket());
     }
 
     @Operation(
@@ -118,20 +103,13 @@ public class BasketController {
     @DeleteMapping
     public ResponseEntity<Void> removeFromBasket(
         @Parameter(
-            description = "UUID пользователя",
-            required = true,
-            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-        )
-        @RequestHeader("User-Id") UUID userId,
-
-        @Parameter(
             description = "UUID товара",
             required = true,
             example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
         )
         @RequestParam("product-id") UUID productId
     ) {
-        basketService.removeFromBasket(userId, productId);
+        basketService.removeFromBasket(productId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

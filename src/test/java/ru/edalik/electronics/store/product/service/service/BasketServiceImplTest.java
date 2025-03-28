@@ -1,5 +1,6 @@
 package ru.edalik.electronics.store.product.service.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,6 +12,7 @@ import ru.edalik.electronics.store.product.service.model.exception.InsufficientQ
 import ru.edalik.electronics.store.product.service.model.exception.NotFoundException;
 import ru.edalik.electronics.store.product.service.repository.BasketRepository;
 import ru.edalik.electronics.store.product.service.repository.ProductRepository;
+import ru.edalik.electronics.store.product.service.service.security.UserContextService;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,15 +39,23 @@ class BasketServiceImplTest {
     @Mock
     ProductRepository productRepository;
 
+    @Mock
+    UserContextService userContextService;
+
     @InjectMocks
     BasketServiceImpl basketService;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(userContextService.getUserGuid()).thenReturn(USER_ID);
+    }
 
     @Test
     void getUserBasket_ShouldReturnBasketList() {
         List<Basket> expected = List.of(mock(Basket.class));
         when(basketRepository.findByUserId(USER_ID)).thenReturn(expected);
 
-        List<Basket> result = basketService.getUserBasket(USER_ID);
+        List<Basket> result = basketService.getUserBasket();
 
         assertEquals(expected, result);
     }
@@ -57,7 +68,7 @@ class BasketServiceImplTest {
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         when(basketRepository.save(any())).thenReturn(expectedBasket);
 
-        Basket result = basketService.addToBasket(USER_ID, PRODUCT_ID, QUANTITY);
+        Basket result = basketService.addToBasket(PRODUCT_ID, QUANTITY);
 
         assertEquals(expectedBasket, result);
     }
@@ -66,7 +77,7 @@ class BasketServiceImplTest {
     void addToBasket_ShouldThrowNotFoundException_WhenProductNotExists() {
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> basketService.addToBasket(USER_ID, PRODUCT_ID, QUANTITY));
+        assertThrows(NotFoundException.class, () -> basketService.addToBasket(PRODUCT_ID, QUANTITY));
     }
 
     @Test
@@ -76,7 +87,7 @@ class BasketServiceImplTest {
 
         assertThrows(
             InsufficientQuantityException.class,
-            () -> basketService.addToBasket(USER_ID, PRODUCT_ID, QUANTITY)
+            () -> basketService.addToBasket(PRODUCT_ID, QUANTITY)
         );
     }
 
@@ -84,14 +95,14 @@ class BasketServiceImplTest {
     void removeFromBasket_ShouldDeleteItem_WhenExists() {
         when(basketRepository.deleteByCompositeKey(USER_ID, PRODUCT_ID)).thenReturn(1);
 
-        assertDoesNotThrow(() -> basketService.removeFromBasket(USER_ID, PRODUCT_ID));
+        assertDoesNotThrow(() -> basketService.removeFromBasket(PRODUCT_ID));
     }
 
     @Test
     void removeFromBasket_ShouldThrowException_WhenNotExists() {
         when(basketRepository.deleteByCompositeKey(USER_ID, PRODUCT_ID)).thenReturn(0);
 
-        assertThrows(NotFoundException.class, () -> basketService.removeFromBasket(USER_ID, PRODUCT_ID));
+        assertThrows(NotFoundException.class, () -> basketService.removeFromBasket(PRODUCT_ID));
     }
 
 }

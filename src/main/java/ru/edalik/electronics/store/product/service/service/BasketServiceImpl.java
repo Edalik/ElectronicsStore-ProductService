@@ -10,6 +10,7 @@ import ru.edalik.electronics.store.product.service.model.exception.NotFoundExcep
 import ru.edalik.electronics.store.product.service.repository.BasketRepository;
 import ru.edalik.electronics.store.product.service.repository.ProductRepository;
 import ru.edalik.electronics.store.product.service.service.interfaces.BasketService;
+import ru.edalik.electronics.store.product.service.service.security.UserContextService;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,14 +23,17 @@ public class BasketServiceImpl implements BasketService {
 
     private final ProductRepository productRepository;
 
+    private final UserContextService userContextService;
+
     @Override
-    public List<Basket> getUserBasket(UUID userId) {
+    public List<Basket> getUserBasket() {
+        UUID userId = userContextService.getUserGuid();
         return basketRepository.findByUserId(userId);
     }
 
     @Override
     @Transactional
-    public Basket addToBasket(UUID userId, UUID productId, int quantity) {
+    public Basket addToBasket(UUID productId, int quantity) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> new NotFoundException("Product with id: %s was not found".formatted(productId)));
 
@@ -37,13 +41,15 @@ public class BasketServiceImpl implements BasketService {
             throw new InsufficientQuantityException();
         }
 
+        UUID userId = userContextService.getUserGuid();
         Basket.BasketId basketId = new Basket.BasketId(userId, product);
         return basketRepository.save(new Basket(basketId, quantity));
     }
 
     @Override
     @Transactional
-    public void removeFromBasket(UUID userId, UUID productId) {
+    public void removeFromBasket(UUID productId) {
+        UUID userId = userContextService.getUserGuid();
         int rowsAffected = basketRepository.deleteByCompositeKey(userId, productId);
         if (rowsAffected < 1) {
             throw new NotFoundException("Product with id: %s was not in basket".formatted(productId));
