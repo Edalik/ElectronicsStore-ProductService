@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PurchaseController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class PurchaseControllerTest {
 
     static final String BASE_URL = "/api/v1/products/purchases";
@@ -56,7 +58,7 @@ class PurchaseControllerTest {
         Purchase purchase = mock(Purchase.class);
         PurchaseDto dto = mock(PurchaseDto.class);
 
-        when(purchaseService.makePurchase(USER_ID, PRODUCT_ID, QUANTITY)).thenReturn(purchase);
+        when(purchaseService.makePurchase(PRODUCT_ID, QUANTITY)).thenReturn(purchase);
         when(purchaseMapper.toDto(purchase)).thenReturn(dto);
 
         mockMvc.perform(
@@ -86,7 +88,7 @@ class PurchaseControllerTest {
     @SneakyThrows
     void makePurchase_ProductNotFound_ReturnsNotFound() {
         String errorMessage = "Product not found";
-        when(purchaseService.makePurchase(USER_ID, PRODUCT_ID, QUANTITY))
+        when(purchaseService.makePurchase(PRODUCT_ID, QUANTITY))
             .thenThrow(new NotFoundException(errorMessage));
 
         mockMvc.perform(
@@ -103,7 +105,7 @@ class PurchaseControllerTest {
     @Test
     @SneakyThrows
     void makePurchase_InsufficientQuantity_ReturnsBadRequest() {
-        when(purchaseService.makePurchase(USER_ID, PRODUCT_ID, QUANTITY))
+        when(purchaseService.makePurchase(PRODUCT_ID, QUANTITY))
             .thenThrow(new InsufficientQuantityException());
 
         mockMvc.perform(
@@ -119,7 +121,7 @@ class PurchaseControllerTest {
     @Test
     @SneakyThrows
     void makePurchase_InsufficientFunds_ReturnsBadRequest() {
-        when(purchaseService.makePurchase(USER_ID, PRODUCT_ID, QUANTITY))
+        when(purchaseService.makePurchase(PRODUCT_ID, QUANTITY))
             .thenThrow(new InsufficientFunds());
 
         mockMvc.perform(
@@ -138,7 +140,7 @@ class PurchaseControllerTest {
         Purchase purchase = mock(Purchase.class);
         PurchaseDto dto = mock(PurchaseDto.class);
 
-        when(purchaseService.getPurchaseById(USER_ID, PURCHASE_ID)).thenReturn(purchase);
+        when(purchaseService.getPurchaseById(PURCHASE_ID)).thenReturn(purchase);
         when(purchaseMapper.toDto(purchase)).thenReturn(dto);
 
         mockMvc.perform(
@@ -153,7 +155,7 @@ class PurchaseControllerTest {
     @SneakyThrows
     void getPurchaseById_NotFound_ReturnsNotFound() {
         String errorMessage = "Purchase not found";
-        when(purchaseService.getPurchaseById(USER_ID, PURCHASE_ID))
+        when(purchaseService.getPurchaseById(PURCHASE_ID))
             .thenThrow(new NotFoundException(errorMessage));
 
         mockMvc.perform(
@@ -171,7 +173,7 @@ class PurchaseControllerTest {
         List<Purchase> purchases = List.of(mock(Purchase.class));
         List<PurchaseDto> dtos = List.of(mock(PurchaseDto.class));
 
-        when(purchaseService.getPurchases(USER_ID)).thenReturn(purchases);
+        when(purchaseService.getPurchases()).thenReturn(purchases);
         when(purchaseMapper.toDto(purchases)).thenReturn(dtos);
 
         mockMvc.perform(
@@ -180,17 +182,6 @@ class PurchaseControllerTest {
             )
             .andExpect(status().isOk())
             .andExpect(content().json(objectMapper.writeValueAsString(dtos)));
-    }
-
-    @Test
-    @SneakyThrows
-    void makePurchase_MissingUserId_ReturnsBadRequest() {
-        mockMvc.perform(
-                post(BASE_URL)
-                    .param(PRODUCT_ID_PARAM, PRODUCT_ID.toString())
-                    .param(QUANTITY_PARAM, "1")
-            )
-            .andExpect(status().isBadRequest());
     }
 
 }

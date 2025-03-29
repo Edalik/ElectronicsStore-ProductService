@@ -18,6 +18,7 @@ import ru.edalik.electronics.store.product.service.repository.ProductRepository;
 import ru.edalik.electronics.store.product.service.repository.PurchaseRepository;
 import ru.edalik.electronics.store.product.service.service.interfaces.PurchaseService;
 import ru.edalik.electronics.store.product.service.service.kafka.KafkaProducer;
+import ru.edalik.electronics.store.product.service.service.security.UserContextService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,6 +38,15 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     private final KafkaProducer kafkaProducer;
 
+    private final UserContextService userContextService;
+
+    @Override
+    @Transactional
+    public Purchase makePurchase(UUID productId, int quantity) {
+        UUID userId = userContextService.getUserGuid();
+        return makePurchase(userId, productId, quantity);
+    }
+
     @Override
     @Transactional
     public Purchase makePurchase(UUID userId, UUID productId, int quantity) {
@@ -49,7 +59,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         BigDecimal totalPrice = product.getPrice().multiply(BigDecimal.valueOf(quantity));
         try {
-            userServiceClient.payment(new BalanceDto(totalPrice), userId);
+            userServiceClient.payment(new BalanceDto(totalPrice));
         } catch (FeignException feignException) {
             if (feignException.status() == 400) throw new InsufficientFunds();
             else throw feignException;
@@ -74,7 +84,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     @Override
     @Transactional
-    public Purchase makePurchaseFromBasket(UUID userId, UUID productId) {
+    public Purchase makePurchaseFromBasket(UUID productId) {
+        UUID userId = userContextService.getUserGuid();
         Basket basket = basketRepository.findByCompositeKey(userId, productId)
             .orElseThrow(() -> new NotFoundException("Basket with id: %s not found".formatted(productId)));
 
@@ -86,13 +97,15 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Purchase getPurchaseById(UUID userId, UUID purchaseId) {
+    public Purchase getPurchaseById(UUID purchaseId) {
+        UUID userId = userContextService.getUserGuid();
         return purchaseRepository.findById(purchaseId, userId)
             .orElseThrow(() -> new NotFoundException("Purchase with id: %s not found".formatted(purchaseId)));
     }
 
     @Override
-    public List<Purchase> getPurchases(UUID userId) {
+    public List<Purchase> getPurchases() {
+        UUID userId = userContextService.getUserGuid();
         return purchaseRepository.findByUserId(userId);
     }
 

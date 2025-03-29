@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,13 +55,6 @@ public class PurchaseController {
     @PostMapping
     public PurchaseDto makePurchase(
         @Parameter(
-            description = "UUID пользователя",
-            required = true,
-            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-        )
-        @RequestHeader("User-Id") UUID userId,
-
-        @Parameter(
             description = "UUID товара",
             required = true,
             example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
@@ -76,7 +68,7 @@ public class PurchaseController {
         )
         @RequestParam @Positive int quantity
     ) {
-        return purchaseMapper.toDto(purchaseService.makePurchase(userId, productId, quantity));
+        return purchaseMapper.toDto(purchaseService.makePurchase(productId, quantity));
     }
 
     @Operation(
@@ -101,20 +93,13 @@ public class PurchaseController {
     @PostMapping("/basket")
     public PurchaseDto makePurchaseFromBasket(
         @Parameter(
-            description = "UUID пользователя",
-            required = true,
-            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-        )
-        @RequestHeader("User-Id") UUID userId,
-
-        @Parameter(
             description = "UUID продукта",
             required = true,
             example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
         )
         @RequestParam("product-id") UUID productId
     ) {
-        return purchaseMapper.toDto(purchaseService.makePurchaseFromBasket(userId, productId));
+        return purchaseMapper.toDto(purchaseService.makePurchaseFromBasket(productId));
     }
 
     @Operation(
@@ -134,20 +119,13 @@ public class PurchaseController {
     @GetMapping("/{id}")
     public PurchaseDto getPurchaseById(
         @Parameter(
-            description = "UUID пользователя",
-            required = true,
-            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-        )
-        @RequestHeader("User-Id") UUID userId,
-
-        @Parameter(
             description = "UUID покупки",
             required = true,
             example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
         )
         @PathVariable UUID id
     ) {
-        return purchaseMapper.toDto(purchaseService.getPurchaseById(userId, id));
+        return purchaseMapper.toDto(purchaseService.getPurchaseById(id));
     }
 
     @Operation(
@@ -160,15 +138,8 @@ public class PurchaseController {
         content = @Content(schema = @Schema(implementation = PurchaseDto.class))
     )
     @GetMapping
-    public List<PurchaseDto> getProducts(
-        @Parameter(
-            description = "UUID пользователя",
-            required = true,
-            example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-        )
-        @RequestHeader("User-Id") UUID userId
-    ) {
-        return purchaseMapper.toDto(purchaseService.getPurchases(userId));
+    public List<PurchaseDto> getProducts() {
+        return purchaseMapper.toDto(purchaseService.getPurchases());
     }
 
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BasketController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class BasketControllerTest {
 
     static final String BASE_URL = "/api/v1/products/basket";
@@ -57,7 +59,7 @@ class BasketControllerTest {
         Basket basket = mock(Basket.class);
         BasketDto dto = mock(BasketDto.class);
 
-        when(basketService.addToBasket(USER_ID, PRODUCT_ID, QUANTITY)).thenReturn(basket);
+        when(basketService.addToBasket(PRODUCT_ID, QUANTITY)).thenReturn(basket);
         when(basketMapper.toDto(basket)).thenReturn(dto);
 
         mockMvc.perform(
@@ -86,7 +88,7 @@ class BasketControllerTest {
     @Test
     @SneakyThrows
     void addToBasket_ExceedingQuantity_ReturnsValidationError() {
-        when(basketService.addToBasket(USER_ID, PRODUCT_ID, QUANTITY)).thenThrow(new InsufficientQuantityException());
+        when(basketService.addToBasket(PRODUCT_ID, QUANTITY)).thenThrow(new InsufficientQuantityException());
 
         mockMvc.perform(
                 post(BASE_URL)
@@ -103,7 +105,7 @@ class BasketControllerTest {
     void addToBasket_ProductNotFound_ReturnsNotFound() {
         String errorMessage = "Product not found";
         int quantity = 1;
-        when(basketService.addToBasket(USER_ID, PRODUCT_ID, quantity))
+        when(basketService.addToBasket(PRODUCT_ID, quantity))
             .thenThrow(new NotFoundException(errorMessage));
 
         mockMvc.perform(post(BASE_URL)
@@ -121,7 +123,7 @@ class BasketControllerTest {
         List<Basket> baskets = List.of(mock(Basket.class));
         List<BasketDto> dtos = List.of(mock(BasketDto.class));
 
-        when(basketService.getUserBasket(USER_ID)).thenReturn(baskets);
+        when(basketService.getUserBasket()).thenReturn(baskets);
         when(basketMapper.toDto(baskets)).thenReturn(dtos);
 
         mockMvc.perform(get(BASE_URL)
@@ -138,7 +140,7 @@ class BasketControllerTest {
                 .param(PRODUCT_ID_PARAM, PRODUCT_ID.toString()))
             .andExpect(status().isNoContent());
 
-        verify(basketService).removeFromBasket(USER_ID, PRODUCT_ID);
+        verify(basketService).removeFromBasket(PRODUCT_ID);
     }
 
     @Test
@@ -146,7 +148,7 @@ class BasketControllerTest {
     void removeFromBasket_ProductNotFound_ReturnsNotFound() {
         String errorMessage = "Product not in basket";
         doThrow(new NotFoundException(errorMessage))
-            .when(basketService).removeFromBasket(USER_ID, PRODUCT_ID);
+            .when(basketService).removeFromBasket(PRODUCT_ID);
 
         mockMvc.perform(delete(BASE_URL)
                 .header(USER_ID_HEADER, USER_ID)
@@ -154,15 +156,6 @@ class BasketControllerTest {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.error").value("Not Found"))
             .andExpect(jsonPath("$.message").value(errorMessage));
-    }
-
-    @Test
-    @SneakyThrows
-    void addToBasket_MissingUserId_ReturnsBadRequest() {
-        mockMvc.perform(post(BASE_URL)
-                .param(PRODUCT_ID_PARAM, PRODUCT_ID.toString())
-                .param(QUANTITY_PARAM, "1"))
-            .andExpect(status().isBadRequest());
     }
 
 }

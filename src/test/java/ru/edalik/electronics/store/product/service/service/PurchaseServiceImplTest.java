@@ -1,6 +1,7 @@
 package ru.edalik.electronics.store.product.service.service;
 
 import feign.FeignException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +16,7 @@ import ru.edalik.electronics.store.product.service.model.exception.NotFoundExcep
 import ru.edalik.electronics.store.product.service.repository.ProductRepository;
 import ru.edalik.electronics.store.product.service.repository.PurchaseRepository;
 import ru.edalik.electronics.store.product.service.service.kafka.KafkaProducer;
+import ru.edalik.electronics.store.product.service.service.security.UserContextService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,8 +26,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,8 +53,16 @@ class PurchaseServiceImplTest {
     @Mock
     KafkaProducer kafkaProducer;
 
+    @Mock
+    UserContextService userContextService;
+
     @InjectMocks
     PurchaseServiceImpl purchaseService;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(userContextService.getUserGuid()).thenReturn(USER_ID);
+    }
 
     @Test
     void makePurchase_ShouldCreatePurchase_WhenValid() {
@@ -66,7 +76,7 @@ class PurchaseServiceImplTest {
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         when(purchaseRepository.save(any())).thenReturn(purchase);
 
-        Purchase result = purchaseService.makePurchase(USER_ID, PRODUCT_ID, QUANTITY);
+        Purchase result = purchaseService.makePurchase(PRODUCT_ID, QUANTITY);
 
         assertEquals(purchase, result);
 
@@ -77,7 +87,7 @@ class PurchaseServiceImplTest {
     void makePurchase_ShouldThrowNotFoundException_WhenProductNotExists() {
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> purchaseService.makePurchase(USER_ID, PRODUCT_ID, QUANTITY));
+        assertThrows(NotFoundException.class, () -> purchaseService.makePurchase(PRODUCT_ID, QUANTITY));
     }
 
     @Test
@@ -91,7 +101,7 @@ class PurchaseServiceImplTest {
 
         assertThrows(
             InsufficientQuantityException.class,
-            () -> purchaseService.makePurchase(USER_ID, PRODUCT_ID, QUANTITY)
+            () -> purchaseService.makePurchase(PRODUCT_ID, QUANTITY)
         );
     }
 
@@ -105,10 +115,10 @@ class PurchaseServiceImplTest {
 
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
         FeignException feignException = mock(FeignException.class);
-        doThrow(feignException).when(userServiceClient).payment(any(), eq(USER_ID));
+        doThrow(feignException).when(userServiceClient).payment(any());
         when(feignException.status()).thenReturn(400);
 
-        assertThrows(InsufficientFunds.class, () -> purchaseService.makePurchase(USER_ID, PRODUCT_ID, QUANTITY));
+        assertThrows(InsufficientFunds.class, () -> purchaseService.makePurchase(PRODUCT_ID, QUANTITY));
     }
 
     @Test
@@ -116,7 +126,7 @@ class PurchaseServiceImplTest {
         Purchase expected = mock(Purchase.class);
         when(purchaseRepository.findById(PURCHASE_ID, USER_ID)).thenReturn(Optional.of(expected));
 
-        Purchase result = purchaseService.getPurchaseById(USER_ID, PURCHASE_ID);
+        Purchase result = purchaseService.getPurchaseById(PURCHASE_ID);
 
         assertEquals(expected, result);
     }
@@ -125,7 +135,7 @@ class PurchaseServiceImplTest {
     void getPurchaseById_ShouldThrowNotFoundException_WhenNotExists() {
         when(purchaseRepository.findById(PURCHASE_ID, USER_ID)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> purchaseService.getPurchaseById(USER_ID, PURCHASE_ID));
+        assertThrows(NotFoundException.class, () -> purchaseService.getPurchaseById(PURCHASE_ID));
     }
 
     @Test
@@ -133,7 +143,7 @@ class PurchaseServiceImplTest {
         List<Purchase> expected = List.of(mock(Purchase.class));
         when(purchaseRepository.findByUserId(USER_ID)).thenReturn(expected);
 
-        List<Purchase> result = purchaseService.getPurchases(USER_ID);
+        List<Purchase> result = purchaseService.getPurchases();
 
         assertEquals(expected, result);
     }
