@@ -19,12 +19,26 @@ spring:
       auto-create: true
     topic:
       notification: electronics.store.notification.request
+    template:
+      observation-enabled: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8090/realms/electronics-store
+
+management:
+  observations:
+    annotations:
+      enabled: true
+  tracing:
+    enabled: true
+    propagation:
+      type: b3_multi
 
 springdoc:
   api-docs:

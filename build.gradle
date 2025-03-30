@@ -46,10 +46,13 @@ dependencies {
 
     // LOGGING
     implementation 'org.zalando:logbook-spring-boot-starter:3.11.0'
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
 
     // TRACING
-    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-tracing'
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'io.github.openfeign:feign-micrometer'
 
     // LOMBOK
     compileOnly 'org.projectlombok:lombok'
