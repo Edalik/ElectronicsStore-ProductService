@@ -77,7 +77,10 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         String notificationMessage = "Successful purchase of %s in quantity of %s was made for a total price of %s"
             .formatted(product.getName(), quantity, totalPrice);
-        kafkaProducer.sendMessage(new NotificationRequest(userId, notificationMessage));
+        String email = userContextService.getEmail();
+        kafkaProducer.sendMessage(
+            new NotificationRequest(userId, "Purchase notification", notificationMessage, email)
+        );
 
         return purchaseRepository.save(purchase);
     }
