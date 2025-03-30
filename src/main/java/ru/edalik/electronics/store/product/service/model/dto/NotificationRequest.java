@@ -7,7 +7,9 @@ import java.util.UUID;
 @Builder
 public record NotificationRequest(
     UUID userId,
-    String text
+    String subject,
+    String text,
+    String email
 ) {
 
 }
