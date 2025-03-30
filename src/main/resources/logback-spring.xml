@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <contextName>PRODUCT-SERVICE</contextName>
+
+    <appender name="async" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:5000</destination>
+        <ringBufferSize>131072</ringBufferSize>
+        <keepAliveDuration>5 minutes</keepAliveDuration>
+        <reconnectionDelay>10 second</reconnectionDelay>
+        <!-- JSON encoder -->
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <pattern>
+                    <pattern>
+                        {
+                        "app": "electronics-store-product-service"
+                        }
+                    </pattern>
+                </pattern>
+                <timestamp/>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <logLevel/>
+                <contextName>
+                    <fieldName>applicationName</fieldName>
+                </contextName>
+                <stackTrace/>
+                <mdc/>
+                <arguments/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <root level="error">
+        <appender-ref ref="async" />
+    </root>
+
+    <logger name="ru.edalik.electronics.store" level="INFO"/>
+    <logger name="org.zalando.logbook" level="TRACE"/>
+
+</configuration>

@@ -1,4 +1,4 @@
-package ru.edalik.electronics.store.product.service.config;
+package ru.edalik.electronics.store.product.service.config.exception;
 
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
@@ -15,8 +15,7 @@ public class CustomErrorAttributes extends DefaultErrorAttributes {
         return super.getErrorAttributes(
             webRequest,
             options.excluding(
-                ErrorAttributeOptions.Include.STACK_TRACE,
-                ErrorAttributeOptions.Include.MESSAGE
+                ErrorAttributeOptions.Include.STACK_TRACE
             )
         );
     }
