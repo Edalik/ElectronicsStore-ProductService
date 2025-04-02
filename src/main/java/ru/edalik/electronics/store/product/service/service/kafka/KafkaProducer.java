@@ -1,6 +1,5 @@
 package ru.edalik.electronics.store.product.service.service.kafka;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,7 @@ public class KafkaProducer {
                 kafkaConfig.getNotificationTopic(),
                 objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(message)
             );
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             log.error("Error while sending message to {}: {}", kafkaConfig.getNotificationTopic(), message, e);
         }
     }
