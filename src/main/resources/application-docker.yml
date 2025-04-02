@@ -1,0 +1,64 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/postgres
+    username: product_service
+    password: product_service
+    hikari:
+      schema: products
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+  kafka:
+    bootstrap-servers: broker-1:9092,broker-2:9092,broker-3:9092
+    admin:
+      auto-create: true
+    topic:
+      notification: electronics.store.notification.request
+    template:
+      observation-enabled: true
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/electronics-store/protocol/openid-connect/certs
+
+  application:
+    name: user-service
+
+management:
+  observations:
+    annotations:
+      enabled: true
+  tracing:
+    enabled: true
+    propagation:
+      type: b3_multi
+
+springdoc:
+  api-docs:
+    path: /product-service/v3/api-docs
+  swagger-ui:
+    path: /product-service/swagger-ui.html
+
+logging:
+  level:
+    org:
+      zalando:
+        logbook:
+          Logbook: TRACE
+
+custom:
+  feign:
+    client:
+      user:
+        service:
+          url: http://user-service:8080/api/v1/users
